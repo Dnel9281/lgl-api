@@ -4,11 +4,17 @@ import Promise = require('bluebird');
 import dietPreferencesList from '../diet-preference';
 var uniqueValidator = require('mongoose-unique-validator');
 
+interface User extends mongoose.Document {
+  username: String,
+  password: String,
+  dietPreferences: [String]
+}
+
 const UserSchema = new mongoose.Schema({
   username: { type: String, index: { unique: true } },
   password: { type: String, minlength: 5, select: false },
   dietPreferences: [{ type: String, enum: dietPreferencesList }]
-});
+}, { usePushEach: true });
 UserSchema.plugin(uniqueValidator);
 
 UserSchema.pre('save', function(next) {
@@ -53,4 +59,4 @@ function dietaryErrorExists(err) {
   }
 }
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model<User>('User', UserSchema);
